@@ -1,3 +1,4 @@
+
 import style from '../../style/friend/index.module.css';
 import AddFriend from './add';
 import FriendList from './list';

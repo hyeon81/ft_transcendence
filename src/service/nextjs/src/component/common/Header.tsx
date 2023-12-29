@@ -1,3 +1,5 @@
+"use client"
+
 import { Avatar, Box, IconButton, Stack, Typography } from '@mui/material';
 import { Menu, ArrowBackIosNew } from '@mui/icons-material';
 import HambergurMenu from '@/component/common/hambergur-menu';

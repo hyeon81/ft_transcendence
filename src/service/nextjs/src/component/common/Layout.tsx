@@ -8,4 +8,5 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => (
 	<div style={{ height: '100%', containerType: 'size' }}>{children}</div>
 );
+
 export default Layout;
