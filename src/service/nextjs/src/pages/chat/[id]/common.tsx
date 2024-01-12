@@ -1,4 +1,4 @@
-import { CommonChatRoom } from '@/component/chat';
+import CommonChatRoom from '@/component/chat/CommonChatRoom';
 
 const ChatCommonPage = () => {
 	return <CommonChatRoom />;

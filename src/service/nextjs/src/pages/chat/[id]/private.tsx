@@ -1,4 +1,4 @@
-import { PrivateChatRoom } from '@/component/chat';
+import PrivateChatRoom from '@/component/chat/PrivateChatRoom';
 
 const ChatPrivatePage = () => {
 	return <PrivateChatRoom />;
