@@ -1,5 +1,6 @@
 import React from 'react';
 import style from '@/style/common/buttom-button/index.module.css';
+import {Typography} from "@mui/material";
 
 interface BottomButtonProps {
 	title: string;
@@ -14,7 +15,7 @@ interface ConfirmBottomButtonProps {
 export const BottomButton = ({ title, onClick }: BottomButtonProps) => {
 	return (
 		<button onClick={onClick} className={style.container}>
-			{title}
+			<Typography fontSize={'md'} fontWeight={'bold'} color={'white'}>{title}</Typography>
 		</button>
 	);
 };

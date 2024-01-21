@@ -5,6 +5,12 @@ body {
 	font-family: 'Inter', sans-serif;
 }
 
+:root {
+	--primary: #9C27B0;
+	--normal: #D9D9D9;
+	--emphasis: #727272;
+}
+
 @font-face {
 	font-family: 'Inter';
 	src: url(../font/Inter/static/Inter-Regular.ttf) format('truetype');

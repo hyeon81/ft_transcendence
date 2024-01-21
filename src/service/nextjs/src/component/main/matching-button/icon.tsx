@@ -4,13 +4,13 @@ interface SVGIconProps {
 	onClick?: () => void;
 }
 
-const MatchingButtonIcon = ({ width, height, onClick }: SVGIconProps) => {
+const MatchingButtonIcon = ({ width, height, onClick}: SVGIconProps) => {
 	return (
 		<svg
 			width={width}
 			height={height}
 			viewBox="0 0 62 62"
-			fill="none"
+			fill={'#ffffff'}
 			xmlns="http://www.w3.org/2000/svg"
 			xmlnsXlink="http://www.w3.org/1999/xlink"
 			onClick={onClick}
