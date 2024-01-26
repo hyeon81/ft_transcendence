@@ -84,7 +84,9 @@ export const SocketProvider = (props: { children: ReactNode }) => {
 		}
 	}, [sockets]);
 
-	if (!socketLoading) return <></>;
+	console.log('sockets', sockets);
+
+	if (!socketLoading) return <div>접속중입니다...</div>;
 	return (
 		<>
 			<SocketContext.Provider value={{ sockets, setSocket }}>{children}</SocketContext.Provider>

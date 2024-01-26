@@ -16,9 +16,16 @@ interface ChannelSettingProps {
 	setOpen?: Dispatch<SetStateAction<boolean>>;
 	channelData?: ChannelInfo;
 	channelId?: string;
+	refetch?: (() => void) | void;
 }
 
-const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSettingProps) => {
+const ChannelSetting = ({
+	isCreate,
+	setOpen,
+	channelData,
+	channelId,
+	refetch,
+}: ChannelSettingProps) => {
 	const router = useRouter();
 	const { sockets } = useContext(SocketContext);
 	const { channelSocket } = sockets;
@@ -46,27 +53,27 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 				title: '비밀번호를 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (visibility === ChannelVisibility.PROTECTED && password.length !== 6) {
 			setMessage({
 				title: '비밀번호는 6자리 숫자로 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (!title || title === '') {
 			setMessage({
 				title: '채널명을 입력해주세요.',
 				success: false,
 			});
+			return setShowSnackbar(true);
 		}
 		if (title.length > 20) {
 			setMessage({
 				title: '채널명은 20byte 이내로 입력해주세요.',
 				success: false,
 			});
-		}
-
-		if (message.title.length > 1) {
 			return setShowSnackbar(true);
 		}
 
@@ -90,6 +97,7 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 						title: label + ' 성공',
 						success: true,
 					});
+					refetch && refetch();
 				} else {
 					setMessage({
 						title: `${label} 실패 ${res?.message ? ': ' + res?.message : ''}`,
@@ -105,8 +113,8 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 		channelSocket,
 		isCreate,
 		label,
-		message.title.length,
 		password,
+		refetch,
 		router,
 		setOpen,
 		title,
@@ -120,13 +128,13 @@ const ChannelSetting = ({ isCreate, setOpen, channelData, channelId }: ChannelSe
 				<Stack gap={4}>
 					<CreateChatVisibility visibility={visibility} setVisibility={setVisibility} />
 					<CreateChatTitle title={title} setTitle={setTitle} />
+					{visibility === 'PROTECTED' && (
+						<CreateChatPassword password={password} setPassword={setPassword} />
+					)}
 					{showSnackbar && (
 						<Typography variant={'inherit'} color={message?.success ? 'green' : 'red'}>
 							{message?.title}
 						</Typography>
-					)}
-					{visibility === 'PROTECTED' && (
-						<CreateChatPassword password={password} setPassword={setPassword} />
 					)}
 				</Stack>
 				{isCreate ? (

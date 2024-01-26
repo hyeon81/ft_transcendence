@@ -28,7 +28,7 @@ interface CommonInterface {
 	profileImageURI: string;
 }
 
-export interface Participant extends CommonInterface {
+export interface Participant {
 	id: string;
 	userId: string;
 	role: string;
@@ -42,7 +42,7 @@ export interface Mute {
 	userId: string;
 }
 
-export type AdminActionType = 'kick' | 'ban' | 'mute' | 'admin';
+export type AdminActionType = 'kick' | 'ban' | 'mute' | 'admin' | 'setting';
 export type ChannelSocketResponse = {
 	channelId: string;
 	userId: string;
