@@ -1,6 +1,6 @@
 import { IconButton, Input, Stack } from '@mui/material';
 import { EnterKey } from '@/component/chat/icon';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import { CommandType } from '@/component/chat/ChatRoomLayout';
 import { useParams } from 'next/navigation';
 
@@ -17,8 +17,10 @@ interface SendChatProps {
 const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 	const [chat, setChat] = useState('');
 	const params = useParams<{ id: string }>();
+	const [chatDisabled, setChatDisabled] = useState(false);
 
-	const onEnter = () => {
+	const onEnter = useCallback(() => {
+		if (chatDisabled) return;
 		if (chat === '' || !chat) return;
 		if (chat[0] === '/') {
 			const chatSplit = chat.split(' ');
@@ -44,7 +46,12 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 			sendAction(chat ?? '');
 			setChat('');
 		}
-	};
+		setChatDisabled(true);
+		setTimeout(() => {
+			setChatDisabled(false);
+		}, 500);
+	}, [chat, chatDisabled, commandAction, params?.id, sendAction]);
+
 	const onChangeInput = (e: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		if (e.target.value.length > 20) return;
 		setChat(e.target.value);
@@ -57,6 +64,7 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 					fullWidth
 					value={chat}
 					onChange={onChangeInput}
+					disabled={chatDisabled}
 					sx={{ backgroundColor: 'white' }}
 					onKeyDown={e => {
 						if (e.key === 'Enter') {
@@ -71,5 +79,4 @@ const SendChat = ({ sendAction, commandAction }: SendChatProps) => {
 		</Stack>
 	);
 };
-
 export default SendChat;

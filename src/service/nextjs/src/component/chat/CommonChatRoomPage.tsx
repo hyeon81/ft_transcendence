@@ -52,6 +52,11 @@ const CommonChatRoomPage = () => {
 	}, [channelSocket, params?.id]);
 
 	useEffect(() => {
+		if (!params?.id) return;
+		getChannelInfo();
+	}, [channelSocket, params?.id]);
+
+	useEffect(() => {
 		if (!channelData) return;
 		if (channelData.participant?.some((data: Participant) => data.userId === me?.id)) {
 			if (channelLoading) return;

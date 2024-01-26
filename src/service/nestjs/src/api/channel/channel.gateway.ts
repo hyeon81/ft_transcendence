@@ -49,6 +49,15 @@ class ChannelGateway {
 		console.log('Client connected to channel namespace');
 	}
 
+	async handleDisconnect(@ConnectedSocket() socket) {
+		try {
+			await this.channelService.deleteEmptyChannel();
+		} catch (error) {
+			console.error("An error occurred in channel.gateway 'handleDisconnect':", error);
+			socket.emit('error', { message: "An error occurred in channel.gateway 'handleDisconnect'" });
+		}
+	}
+
 	@SubscribeMessage('create')
 	async handleCreate(@ConnectedSocket() socket, @MessageBody() data) {
 		try {
@@ -101,7 +110,7 @@ class ChannelGateway {
 				if (error.length > 0) {
 					throw new Error('Failed validation: ' + JSON.stringify(error));
 				}
-				await this.participantService.update(participant.id, newSocketId);
+				await this.participantService.update(participant.userId, newSocketId);
 			} else {
 				await this.participantService.create({
 					channelId: joinData.channelId,
@@ -199,8 +208,9 @@ class ChannelGateway {
 			const participant = await this.participantService.get(socket.user.id);
 
 			socket.to(participant.channelId).emit('leave', {
-				message: `${socket.user.id} has left the channel`,
-				profileImageURI: participant.userProfileImageURI,
+				channelId: participant.channelId,
+				userId: socket.user.id,
+				nickname: socket.user.nickname,
 			});
 			await this.channelService.leaveChannel(socket, socket.user.id);
 
@@ -216,17 +226,19 @@ class ChannelGateway {
 	async handleRole(@MessageBody() data, @ConnectedSocket() socket) {
 		try {
 			const toUser = await this.userService.get(data.toUserId);
-			if (toUser) {
+			if (!toUser) {
 				throw new Error('User not found');
 			}
 			if ((await this.participantService.isOwner(socket.user.id)) === false) {
 				throw new Error('Permission denied');
 			}
-			const newRole: ParticipantDto.Request.Update =  { role: data.role, socketId: socket.id };
+
+			const newRole: ParticipantDto.Request.Update = { role: data.role, socketId: socket.id };
 
 			await this.participantService.update(data.toUserId, newRole);
 
 			socket.emit('role', { userId: data.toUserId, nickname: toUser.nickname });
+
 			return { res: true };
 		} catch (error) {
 			return { res: false, message: error };

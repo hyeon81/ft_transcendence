@@ -98,12 +98,12 @@ const ChannelSetting = ({
 						success: true,
 					});
 					refetch && refetch();
+					setOpen && setOpen(false);
 				} else {
 					setMessage({
 						title: `${label} 실패 ${res?.message ? ': ' + res?.message : ''}`,
 						success: false,
 					});
-					setOpen && setOpen(false);
 				}
 				setShowSnackbar(true);
 			});
