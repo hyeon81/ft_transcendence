@@ -171,7 +171,7 @@ const CommonChatRoomPage = () => {
 					break;
 			}
 		},
-		[setActionMessage],
+		[getChannelInfo, setActionMessage],
 	);
 
 	// 이용자 게임 초대

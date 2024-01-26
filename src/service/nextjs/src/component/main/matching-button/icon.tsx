@@ -1,5 +1,3 @@
-import { Box } from '@mui/material';
-
 interface SVGIconProps {
 	width: number | string;
 	height: number | string;

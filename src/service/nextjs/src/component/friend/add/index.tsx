@@ -51,29 +51,26 @@ const AddFriend = ({ friendList, refetch, blockList, blockRefetch }: AddFriendPr
 		}
 	};
 
-	const setFriend = useCallback(
-		async (id: string, mode: 'add' | 'delete') => {
-			const title = mode === 'add' ? '친구 추가' : '친구 삭제';
-			try {
-				await (mode == 'add'
-					? postFetcher('/friend', { friendId: id })
-					: deleteFetcher(`/friend/${id}`));
-				setMessage({
-					title: title + ' 성공',
-					success: true,
-				});
-				setShowSuccessSnackbar(true);
-				refetch();
-			} catch (error) {
-				setMessage({
-					title: title + ' 실패',
-					success: false,
-				});
-				setShowSuccessSnackbar(true);
-			}
-		},
-		[refetch],
-	);
+	const setFriend = useCallback(async (id: string, mode: 'add' | 'delete') => {
+		const title = mode === 'add' ? '친구 추가' : '친구 삭제';
+		try {
+			await (mode == 'add'
+				? postFetcher('/friend', { friendId: id })
+				: deleteFetcher(`/friend/${id}`));
+			setMessage({
+				title: title + ' 성공',
+				success: true,
+			});
+			setShowSuccessSnackbar(true);
+			refetch();
+		} catch (error) {
+			setMessage({
+				title: title + ' 실패',
+				success: false,
+			});
+			setShowSuccessSnackbar(true);
+		}
+	}, []);
 
 	const isFriend = (id: string) => {
 		return friendList?.some(friend => friend.friendId === id);
