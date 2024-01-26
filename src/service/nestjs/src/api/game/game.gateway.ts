@@ -35,12 +35,8 @@ class GameGateway {
 
 	handleConnection(socket: Socket) {
 		try {
-			//console.log('Client connected to game namespace');
-			this.gameService.getBySocketId(socket.id).then(game => {
-				if (game) {
-					this.gameService.delete(game.id);
-				}
-			});
+			console.log('Client connected to game namespace');
+			void socket;
 		} catch (error) {
 			console.error(error);
 		}
@@ -49,18 +45,13 @@ class GameGateway {
 	handleDisconnect(socket: Socket) {
 		try {
 			console.log('Client disconnected from game namespace');
-			this.gameService.getBySocketId(socket.id).then(game => {
+			this.gameService.getBySocketId(socket.id).then(async game => {
 				if (game) {
-					this.gameService.delete(game.id);
-					this.gameService.deleteFirstHistory(game.userId);
-					this.userService.online(game.userId);
-				}
-			});
-			this.gameService.getByUserId(socket['user']['id']).then(game => {
-				if (game) {
-					this.gameService.delete(game.id);
-					this.gameService.deleteFirstHistory(game.userId);
-					this.userService.online(game.userId);
+					await this.gameService.delete(game.id);
+					if (game.userId) {
+						await this.gameService.deleteFirstHistory(game.userId);
+						await this.userService.online(game.userId);
+					}
 				}
 			});
 		} catch (error) {
@@ -88,13 +79,13 @@ class GameGateway {
 			socket.join('queue');
 			this.userService.playing(socket['user']['id']);
 
-			const clients = Array.from(this.getRoom('queue'));
-			if (clients.length === 1) {
+			const room = this.getRoom('queue');
+			if (room.size === 1) {
 				return;
 			}
 
-			const player1 = clients[0];
-			const player2 = clients[1];
+			const player1 = socket.id;
+			const player2 = this.getOpponentSocketId(socket, 'queue');
 
 			await this.gameService.create({ socketId: player1, mode: 'HARD' });
 			await this.gameService.create({ socketId: player2, mode: 'HARD' });
@@ -127,6 +118,9 @@ class GameGateway {
 		@MessageBody() connectedRequestDto: Dto.Request.Connected,
 	) {
 		let game = await this.gameService.getBySocketId(socket.id);
+		if (!game) {
+			return { status: 'SUCCESS' };
+		}
 
 		try {
 			if (!game.userId) {
@@ -262,43 +256,46 @@ class GameGateway {
 
 			// database
 			{
-				let player1History = await this.gameService.getFirstHistory(game.id);
+				let player1History = await this.gameService.getFirstHistory(game.id, game.userId);
 				if (!player1History || player1History.result !== 'PENDING') {
 					player1History = await this.gameService.createHistory(game.id, {
 						player1Id: game.userId,
 						player2Id: opponentGame.userId,
-						mode: game.mode,
-						player1Score: parseInt(scoreRequestDto.score),
-						player2Score: 0,
-						result: 'PENDING',
-					});
-				} else {
-					this.gameService.updateHistory(player1History.id, {
-						player1Score: parseInt(scoreRequestDto.score),
-					});
-				}
-
-				let player2History = await this.gameService.getFirstHistory(game.id);
-				if (!player2History || player2History.result !== 'PENDING') {
-					player2History = await this.gameService.createHistory(game.id, {
-						player1Id: opponentGame.userId,
-						player2Id: game.userId,
 						mode: game.mode,
 						player1Score: 0,
 						player2Score: parseInt(scoreRequestDto.score),
 						result: 'PENDING',
 					});
 				} else {
-					this.gameService.updateHistory(player2History.id, {
+					player1History = await this.gameService.updateHistory(player1History.id, {
 						player2Score: parseInt(scoreRequestDto.score),
+					});
+				}
+
+				let player2History = await this.gameService.getFirstHistory(
+					opponentGame.id,
+					opponentGame.userId,
+				);
+				if (!player2History || player2History.result !== 'PENDING') {
+					player2History = await this.gameService.createHistory(opponentGame.id, {
+						player1Id: opponentGame.userId,
+						player2Id: game.userId,
+						mode: game.mode,
+						player1Score: parseInt(scoreRequestDto.score),
+						player2Score: 0,
+						result: 'PENDING',
+					});
+				} else {
+					player2History = await this.gameService.updateHistory(player2History.id, {
+						player1Score: parseInt(scoreRequestDto.score),
 					});
 				}
 				if (parseInt(scoreRequestDto.score) === 4) {
 					this.gameService.updateHistory(player1History.id, {
-						result: 'WIN',
+						result: 'LOSE',
 					});
 					this.gameService.updateHistory(player2History.id, {
-						result: 'LOSE',
+						result: 'WIN',
 					});
 					this.gameService.delete(game.id);
 					this.gameService.delete(opponentGame.id);
