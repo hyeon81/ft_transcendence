@@ -17,5 +17,9 @@
 <br/>
 
 ## Index
+### Figma
+![image](https://github.com/hyeon81/ft_transcendence/assets/94117828/feef69e0-5fbf-424e-a4d2-d799f1cf3412)
+https://www.figma.com/file/PKiezjQHUtEQ4dbc7i7J0J/ft_tsen?type=design&node-id=0-1&mode=design&t=WpW66ZHxdJOAxrxc-0
 
 ## Preview
+![image](https://github.com/hyeon81/ft_transcendence/assets/94117828/aa2edae0-5ca6-4df2-85e7-777e7bce9f91)
